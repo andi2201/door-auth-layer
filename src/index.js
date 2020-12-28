@@ -75,10 +75,16 @@ app.use(cors);
 app.use(cookieParser);
 app.use(validateFirebaseIdToken);
 
-app.listen(3000);
+app.listen(process.env.PORT || 8080);
+
+console.log("listening on " + process.env.PORT || 8080)
 
 app.get("/", async (req, res) => {
   const db = admin.firestore()
   const userRef = await db.collection("users").doc(req.user.uid).get()
+
+  // call endpoint to open the door
+
+
   res.send(userRef.data());
 });
