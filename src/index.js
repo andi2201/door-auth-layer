@@ -77,7 +77,7 @@ app.use(validateFirebaseIdToken);
 
 app.listen(3000);
 
-app.get("/test/:userId", async (req, res) => {
+app.get("/", async (req, res) => {
   const db = admin.firestore()
   const userRef = await db.collection("users").doc(req.user.uid).get()
   res.send(userRef.data());
