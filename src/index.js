@@ -77,8 +77,6 @@ app.use(validateFirebaseIdToken);
 
 app.listen(process.env.PORT || 8080);
 
-console.log("listening on " + process.env.PORT ? process.env.PORT : "8080")
-
 app.get("/", async (req, res) => {
   const db = admin.firestore()
   const userRef = await db.collection("users").doc(req.user.uid).get()
