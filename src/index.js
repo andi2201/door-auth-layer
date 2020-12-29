@@ -75,7 +75,7 @@ app.use(cors);
 app.use(cookieParser);
 app.use(validateFirebaseIdToken);
 
-app.listen(process.env.PORT || 8080);
+app.listen(process.env.PORT || 8082);
 
 app.get("/", async (req, res) => {
   const db = admin.firestore()
