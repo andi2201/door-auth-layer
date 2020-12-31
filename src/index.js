@@ -18,6 +18,8 @@ const cors = require("cors")({
 
 const app = express();
 
+const axios = require('axios');
+
 
 
 // Express middleware that validates Firebase ID Tokens passed in the Authorization HTTP header.
@@ -82,6 +84,13 @@ app.get("/", async (req, res) => {
   const userRef = await db.collection("users").doc(req.user.uid).get()
 
   // call endpoint to open the door
+
+  const openResult = await axios.get(process.env.SHELLY)
+  console.log(openResult )
+
+  
+
+  // return {isSuccess: true} if ok
 
 
   res.send(userRef.data());
