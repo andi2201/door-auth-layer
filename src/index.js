@@ -18,16 +18,14 @@ const cors = require("cors")({
 
 const app = express();
 
-const axios = require('axios');
-
-
+const axios = require("axios");
 
 // Express middleware that validates Firebase ID Tokens passed in the Authorization HTTP header.
 // The Firebase ID token needs to be passed as a Bearer token in the Authorization HTTP header like this:
 // `Authorization: Bearer <Firebase ID Token>`.
 // when decoded successfully, the ID Token content will be added as `req.user`.
 const validateFirebaseIdToken = async (req, res, next) => {
-  console.log("Check if request is authorized with Firebase ID token");
+  // console.log("Check if request is authorized with Firebase ID token");
   if (
     (!req.headers.authorization ||
       !req.headers.authorization.startsWith("Bearer ")) &&
@@ -48,11 +46,11 @@ const validateFirebaseIdToken = async (req, res, next) => {
     req.headers.authorization &&
     req.headers.authorization.startsWith("Bearer ")
   ) {
-    console.log('Found "Authorization" header');
+    // console.log('Found "Authorization" header');
     // Read the ID Token from the Authorization header.
     idToken = req.headers.authorization.split("Bearer ")[1];
   } else if (req.cookies) {
-    console.log('Found "__session" cookie');
+    // console.log('Found "__session" cookie');
     // Read the ID Token from cookie.
     idToken = req.cookies.__session;
   } else {
@@ -80,18 +78,33 @@ app.use(validateFirebaseIdToken);
 app.listen(process.env.PORT || 8082);
 
 app.get("/", async (req, res) => {
-  const db = admin.firestore()
-  const userRef = await db.collection("users").doc(req.user.uid).get()
+  const db = admin.firestore();
+  const userRef = await db.collection("users").doc(req.user.uid).get();
 
-  // call endpoint to open the door
+  if (userRef.data().isAuthorized === true) {
+    // call endpoint to open the door
+    try {
+      const openResult = await axios.get(process.env.SHELLY, { timeout: 3000 });
+      // console.log(openResult.data);
 
-  const openResult = await axios.get(process.env.SHELLY)
-  console.log(openResult )
-
-  
-
-  // return {isSuccess: true} if ok
-
-
-  res.send(userRef.data());
+      if (openResult.data?.ison) {
+        res.send({
+          ok: true,
+        });
+      } else {
+        res.send({
+          ok: false,
+        });
+      }
+    } catch {
+      res.send({
+        ok: false,
+      });
+    }
+  }else{
+    res.send({
+      authorized: false,
+      ok: false,
+    });
+  }
 });
