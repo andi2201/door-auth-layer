@@ -88,20 +88,24 @@ app.get("/", async (req, res) => {
       // console.log(openResult.data);
 
       if (openResult.data?.ison) {
+        // TODO: user x opened the door.
         res.send({
           ok: true,
         });
       } else {
+        // TODO: user x tried to open the door, shelly didnt work.
         res.send({
           ok: false,
         });
       }
     } catch {
+      // TODO: user x tried to open the door, something exceptionally bad happened.
       res.send({
         ok: false,
       });
     }
   }else{
+    // TODO: user x tried to open the door but is not authorized.
     res.send({
       authorized: false,
       ok: false,
