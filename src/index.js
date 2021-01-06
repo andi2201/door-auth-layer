@@ -31,12 +31,12 @@ const validateFirebaseIdToken = async (req, res, next) => {
       !req.headers.authorization.startsWith("Bearer ")) &&
     !(req.cookies && req.cookies.__session)
   ) {
-    console.error(
-      "No Firebase ID token was passed as a Bearer token in the Authorization header.",
-      "Make sure you authorize your request by providing the following HTTP header:",
-      "Authorization: Bearer <Firebase ID Token>",
-      'or by passing a "__session" cookie.'
-    );
+    // console.error(
+    //   "No Firebase ID token was passed as a Bearer token in the Authorization header.",
+    //   "Make sure you authorize your request by providing the following HTTP header:",
+    //   "Authorization: Bearer <Firebase ID Token>",
+    //   'or by passing a "__session" cookie.'
+    // );
     res.status(403).send("Unauthorized");
     return;
   }
@@ -65,7 +65,7 @@ const validateFirebaseIdToken = async (req, res, next) => {
     next();
     return;
   } catch (error) {
-    console.error("Error while verifying Firebase ID token:", error);
+    // console.error("Error while verifying Firebase ID token:", error);
     res.status(403).send("Unauthorized");
     return;
   }
@@ -76,6 +76,21 @@ app.use(cookieParser);
 app.use(validateFirebaseIdToken);
 
 app.listen(process.env.PORT || 8082);
+
+function logEvent(db, userId, userName, message, ok) {
+  const logObj = {
+    timestamp: Date.now().toString(),
+    userId: userId,
+    userName: userName,
+    message: message,
+    ok: ok,
+  };
+  try {
+    // intentionally not awaiting
+    db.collection("logs").add(logObj);
+    console.log(logObj);
+  } catch {}
+}
 
 app.get("/", async (req, res) => {
   const db = admin.firestore();
@@ -89,23 +104,54 @@ app.get("/", async (req, res) => {
 
       if (openResult.data?.ison) {
         // TODO: user x opened the door.
+        logEvent(
+          db,
+          req.user.uid,
+          userRef.data().name,
+          `${userRef.data().name} opened the door.`,
+          true
+        );
+
         res.send({
           ok: true,
         });
       } else {
         // TODO: user x tried to open the door, shelly didnt work.
+        logEvent(
+          db,
+          req.user.uid,
+          userRef.data().name,
+          `${
+            userRef.data().name
+          } tried to open but shelly didnt work properly.`,
+          false
+        );
         res.send({
           ok: false,
         });
       }
     } catch {
       // TODO: user x tried to open the door, something exceptionally bad happened.
+      logEvent(
+        db,
+        req.user.uid,
+        userRef.data().name,
+        `${userRef.data().name} tried to open but shelly seems to not respond.`,
+        false
+      );
       res.send({
         ok: false,
       });
     }
-  }else{
+  } else {
     // TODO: user x tried to open the door but is not authorized.
+    logEvent(
+      db,
+      req.user.uid,
+      userRef.data().name,
+      `${userRef.data().name} tried to open but is not authorized.`,
+      false
+    );
     res.send({
       authorized: false,
       ok: false,
