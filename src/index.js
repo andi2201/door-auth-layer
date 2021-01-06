@@ -79,7 +79,7 @@ app.listen(process.env.PORT || 8082);
 
 function logEvent(db, userId, userName, message, ok) {
   const logObj = {
-    timestamp: Date.now().toString(),
+    timestamp: admin.firestore.FieldValue.serverTimestamp(),
     userId: userId,
     userName: userName,
     message: message,
