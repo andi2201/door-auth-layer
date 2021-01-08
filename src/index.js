@@ -35,7 +35,7 @@ const validateFirebaseIdToken = async (req, res, next) => {
     //   'or by passing a "__session" cookie.'
     // );
     couch.createLog("No Bearer token and no cookie.", req.ip);
-    res.status(403).send("Unauthorized");
+    await res.status(403).send("Unauthorized");
     return;
   }
 
@@ -53,7 +53,7 @@ const validateFirebaseIdToken = async (req, res, next) => {
     idToken = req.cookies.__session;
   } else {
     // No cookie
-    couch.createLog("No Bearer token and no cookie.", req.ip);
+    await couch.createLog("No Bearer token and no cookie.", req.ip);
     res.status(403).send("Unauthorized");
     return;
   }
@@ -65,7 +65,7 @@ const validateFirebaseIdToken = async (req, res, next) => {
     return;
   } catch (error) {
     // console.error("Error while verifying Firebase ID token:", error);
-    couch.createLog("ID token not valid.", req.ip);
+    await couch.createLog("ID token not valid.", req.ip);
     res.status(403).send("Unauthorized");
     return;
   }

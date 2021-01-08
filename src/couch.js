@@ -1,8 +1,5 @@
 const axios = require("axios");
 
-// this is not async by choice!
-// well, it is now. if the user is not authorized, they will wait a couple of ms.
-
 module.exports = {
   createLog: async (text, ip) => {
     try {
