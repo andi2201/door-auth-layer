@@ -17,8 +17,6 @@ const axios = require("axios");
 
 const couch = require("./couch");
 
-couch.createLog();
-
 // Express middleware that validates Firebase ID Tokens passed in the Authorization HTTP header.
 // The Firebase ID token needs to be passed as a Bearer token in the Authorization HTTP header like this:
 // `Authorization: Bearer <Firebase ID Token>`.
@@ -36,6 +34,7 @@ const validateFirebaseIdToken = async (req, res, next) => {
     //   "Authorization: Bearer <Firebase ID Token>",
     //   'or by passing a "__session" cookie.'
     // );
+    couch.createLog("No Bearer token and no cookie.", req.ip);
     res.status(403).send("Unauthorized");
     return;
   }
@@ -54,6 +53,7 @@ const validateFirebaseIdToken = async (req, res, next) => {
     idToken = req.cookies.__session;
   } else {
     // No cookie
+    couch.createLog("No Bearer token and no cookie.", req.ip);
     res.status(403).send("Unauthorized");
     return;
   }
@@ -65,6 +65,7 @@ const validateFirebaseIdToken = async (req, res, next) => {
     return;
   } catch (error) {
     // console.error("Error while verifying Firebase ID token:", error);
+    couch.createLog("ID token not valid.", req.ip);
     res.status(403).send("Unauthorized");
     return;
   }
