@@ -34,8 +34,8 @@ const validateFirebaseIdToken = async (req, res, next) => {
     //   "Authorization: Bearer <Firebase ID Token>",
     //   'or by passing a "__session" cookie.'
     // );
-    couch.createLog("No Bearer token and no cookie.", req.ip);
-    await res.status(403).send("Unauthorized");
+    await couch.createLog("No Bearer token and no cookie.", req.ip);
+    res.status(403).send("Unauthorized");
     return;
   }
 
