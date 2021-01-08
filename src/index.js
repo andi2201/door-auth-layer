@@ -3,11 +3,6 @@
 const admin = require("firebase-admin");
 admin.initializeApp();
 
-// {
-//     credential: admin.credential.applicationDefault(),
-//     databaseURL: "https://open-door-be.firebaseio.com",
-//   }
-
 require("dotenv").config();
 
 const express = require("express");
@@ -19,6 +14,10 @@ const cors = require("cors")({
 const app = express();
 
 const axios = require("axios");
+
+const couch = require("./couch");
+
+couch.createLog();
 
 // Express middleware that validates Firebase ID Tokens passed in the Authorization HTTP header.
 // The Firebase ID token needs to be passed as a Bearer token in the Authorization HTTP header like this:
