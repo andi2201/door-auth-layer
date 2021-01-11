@@ -22,6 +22,10 @@ const couch = require("./couch");
 // `Authorization: Bearer <Firebase ID Token>`.
 // when decoded successfully, the ID Token content will be added as `req.user`.
 const validateFirebaseIdToken = async (req, res, next) => {
+
+  const forwarded = req.headers['x-forwarded-for']
+  const ip = forwarded ? forwarded.split(/, /)[0] : req.connection.remoteAddress
+
   // console.log("Check if request is authorized with Firebase ID token");
   if (
     (!req.headers.authorization ||
@@ -34,7 +38,7 @@ const validateFirebaseIdToken = async (req, res, next) => {
     //   "Authorization: Bearer <Firebase ID Token>",
     //   'or by passing a "__session" cookie.'
     // );
-    await couch.createLog("No Bearer token and no cookie.", req.connection.remoteAddress);
+    await couch.createLog("-> No Bearer token and no cookie.", ip);
     res.status(403).send("Unauthorized");
     return;
   }
@@ -53,7 +57,7 @@ const validateFirebaseIdToken = async (req, res, next) => {
     idToken = req.cookies.__session;
   } else {
     // No cookie
-    await couch.createLog("No Bearer token and no cookie.", req.connection.remoteAddress);
+    await couch.createLog("No Bearer token and no cookie.", ip);
     res.status(403).send("Unauthorized");
     return;
   }
@@ -65,7 +69,7 @@ const validateFirebaseIdToken = async (req, res, next) => {
     return;
   } catch (error) {
     // console.error("Error while verifying Firebase ID token:", error);
-    await couch.createLog("ID token not valid.", req.connection.remoteAddress);
+    await couch.createLog("ID token not valid.", ip);
     res.status(403).send("Unauthorized");
     return;
   }
