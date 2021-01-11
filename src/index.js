@@ -92,7 +92,6 @@ function logEvent(db, userId, userName, message, ok) {
   try {
     // intentionally not awaiting
     db.collection("logs").add(logObj);
-    console.log(logObj);
   } catch {}
 }
 
