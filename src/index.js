@@ -100,13 +100,10 @@ app.get("/", async (req, res) => {
   const userRef = await db.collection("users").doc(req.user.uid).get();
 
   if (userRef.data().isAuthorized === true) {
-    // call endpoint to open the door
     try {
       const openResult = await axios.get(process.env.SHELLY, { timeout: 3000 });
-      // console.log(openResult.data);
 
       if (openResult.data?.ison) {
-        // TODO: user x opened the door.
         logEvent(
           db,
           req.user.uid,
@@ -119,7 +116,6 @@ app.get("/", async (req, res) => {
           ok: true,
         });
       } else {
-        // TODO: user x tried to open the door, shelly didnt work.
         logEvent(
           db,
           req.user.uid,
@@ -134,7 +130,6 @@ app.get("/", async (req, res) => {
         });
       }
     } catch {
-      // TODO: user x tried to open the door, something exceptionally bad happened.
       logEvent(
         db,
         req.user.uid,
@@ -147,7 +142,6 @@ app.get("/", async (req, res) => {
       });
     }
   } else {
-    // TODO: user x tried to open the door but is not authorized.
     logEvent(
       db,
       req.user.uid,
