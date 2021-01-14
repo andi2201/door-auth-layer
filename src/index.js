@@ -12,9 +12,9 @@ const cors = require("cors")({
 });
 
 const app = express();
+const helmet = require('helmet');
 
 const axios = require("axios");
-
 const couch = require("./couch");
 
 // Express middleware that validates Firebase ID Tokens passed in the Authorization HTTP header.
@@ -76,6 +76,7 @@ const validateFirebaseIdToken = async (req, res, next) => {
 };
 
 app.use(cors);
+app.use(helmet());
 app.use(cookieParser);
 app.use(validateFirebaseIdToken);
 
