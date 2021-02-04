@@ -12,19 +12,18 @@ const cors = require("cors")({
 });
 
 const app = express();
-const helmet = require('helmet');
+const helmet = require("helmet");
 
 const axios = require("axios");
 const couch = require("./couch");
 
-// Express middleware that validates Firebase ID Tokens passed in the Authorization HTTP header.
-// The Firebase ID token needs to be passed as a Bearer token in the Authorization HTTP header like this:
-// `Authorization: Bearer <Firebase ID Token>`.
-// when decoded successfully, the ID Token content will be added as `req.user`.
+// Function that validates Firebase ID Tokens passed in the Authorization HTTP header.
+// When decoded successfully, the ID Token content will be added as `req.user`.
 const validateFirebaseIdToken = async (req, res, next) => {
-
-  const forwarded = req.headers['x-forwarded-for']
-  const ip = forwarded ? forwarded.split(/, /)[0] : req.connection.remoteAddress
+  const forwarded = req.headers["x-forwarded-for"];
+  const ip = forwarded
+    ? forwarded.split(/, /)[0]
+    : req.connection.remoteAddress;
 
   // console.log("Check if request is authorized with Firebase ID token");
   if (
@@ -32,12 +31,6 @@ const validateFirebaseIdToken = async (req, res, next) => {
       !req.headers.authorization.startsWith("Bearer ")) &&
     !(req.cookies && req.cookies.__session)
   ) {
-    // console.error(
-    //   "No Firebase ID token was passed as a Bearer token in the Authorization header.",
-    //   "Make sure you authorize your request by providing the following HTTP header:",
-    //   "Authorization: Bearer <Firebase ID Token>",
-    //   'or by passing a "__session" cookie.'
-    // );
     await couch.createLog("-> No Bearer token and no cookie.", ip);
     res.status(403).send("Unauthorized");
     return;
@@ -48,15 +41,13 @@ const validateFirebaseIdToken = async (req, res, next) => {
     req.headers.authorization &&
     req.headers.authorization.startsWith("Bearer ")
   ) {
-    // console.log('Found "Authorization" header');
     // Read the ID Token from the Authorization header.
     idToken = req.headers.authorization.split("Bearer ")[1];
   } else if (req.cookies) {
-    // console.log('Found "__session" cookie');
     // Read the ID Token from cookie.
     idToken = req.cookies.__session;
   } else {
-    // No cookie
+    // No cookie and no token
     await couch.createLog("No Bearer token and no cookie.", ip);
     res.status(403).send("Unauthorized");
     return;
@@ -82,6 +73,7 @@ app.use(validateFirebaseIdToken);
 
 app.listen(process.env.PORT || 8082);
 
+// Helper function for logging to firebase
 function logEvent(db, userId, userName, message, ok) {
   const logObj = {
     timestamp: admin.firestore.FieldValue.serverTimestamp(),
@@ -95,6 +87,7 @@ function logEvent(db, userId, userName, message, ok) {
     db.collection("logs").add(logObj);
   } catch {}
 }
+
 
 app.get("/", async (req, res) => {
   const db = admin.firestore();
@@ -123,7 +116,7 @@ app.get("/", async (req, res) => {
           userRef.data().name,
           `${
             userRef.data().name
-          } tried to open but shelly didnt work properly.`,
+          } tried to open but shelly didnt work.`,
           false
         );
         res.send({
@@ -135,7 +128,7 @@ app.get("/", async (req, res) => {
         db,
         req.user.uid,
         userRef.data().name,
-        `${userRef.data().name} tried to open but shelly seems to not respond.`,
+        `${userRef.data().name} tried to open, shelly did not respond.`,
         false
       );
       res.send({
@@ -147,7 +140,7 @@ app.get("/", async (req, res) => {
       db,
       req.user.uid,
       userRef.data().name,
-      `${userRef.data().name} tried to open but is not authorized.`,
+      `${userRef.data().name} is not authorized.`,
       false
     );
     res.send({
