@@ -1,6 +1,6 @@
 {
   "name": "door-auth-layer",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -13,9 +13,9 @@
     "axios": "^0.21.1",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
-    "dotenv": "^8.2.0",
+    "dotenv": "^9.0.2",
     "express": "^4.17.1",
-    "firebase-admin": "^9.4.2",
-    "helmet": "^4.3.1"
+    "firebase-admin": "^9.8.0",
+    "helmet": "^4.6.0"
   }
 }
